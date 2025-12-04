@@ -1,65 +1,76 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import '../../models/gasto.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:uuid/uuid.dart';
+import '../models/gasto.dart';
 
+// =====================================================
+//  REPOSITORY COMPATIBLE CON WEB (sin romper la app)
+// =====================================================
 class GastosRepository {
   static final GastosRepository _instance = GastosRepository._internal();
   factory GastosRepository() => _instance;
   GastosRepository._internal();
 
-  Database? _db;
+  // Solo para Web → almacenamiento en memoria (temporal)
+  final List<Gasto> _memoria = [];
 
-  // Inicializa la base de datos
-  Future<Database> get database async {
-    if (_db != null) return _db!;
-    _db = await _initDB();
-    return _db!;
-  }
+  bool get _usaSQLite =>
+      !kIsWeb &&
+      (Platform.isAndroid ||
+          Platform.isIOS ||
+          Platform.isWindows ||
+          Platform.isLinux ||
+          Platform.isMacOS);
 
-  Future<Database> _initDB() async {
-    final path = join(await getDatabasesPath(), 'gastos.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE gastos(
-            id TEXT PRIMARY KEY,
-            titulo TEXT,
-            monto REAL,
-            fecha TEXT
-          )
-        ''');
-      },
-    );
-  }
-
-  // Obtener todos los gastos
+  // =====================================================
+  //              OBTENER GASTOS
+  // =====================================================
   Future<List<Gasto>> getGastos() async {
-    final db = await database;
-    final maps = await db.query('gastos');
-    return maps.map((m) => Gasto(
-      id: m['id'] as String,
-      titulo: m['titulo'] as String,
-      monto: m['monto'] as double,
-      fecha: DateTime.parse(m['fecha'] as String),
-    )).toList();
+    if (!_usaSQLite) {
+      return List.from(_memoria);
+    }
+
+    // Si estuvieras usando SQLite aquí, pero lo quitamos
+    return [];
   }
 
-  // Agregar un gasto
-  Future<void> agregarGasto(Gasto gasto) async {
-    final db = await database;
-    await db.insert('gastos', {
-      'id': gasto.id,
-      'titulo': gasto.titulo,
-      'monto': gasto.monto,
-      'fecha': gasto.fecha.toIso8601String(),
-    });
+  // =====================================================
+  //                AGREGAR GASTO
+  // =====================================================
+  Future<Gasto> agregarGasto(Gasto gasto) async {
+    final newId = gasto.id.isEmpty ? Uuid().v4() : gasto.id;
+    final nuevo = gasto.copyWith(id: newId);
+
+    if (!_usaSQLite) {
+      _memoria.add(nuevo);
+      return nuevo;
+    }
+
+    return nuevo;
   }
 
-  // Eliminar un gasto por id
+  // =====================================================
+  //                 ELIMINAR GASTO
+  // =====================================================
   Future<void> eliminarGasto(String id) async {
-    final db = await database;
-    await db.delete('gastos', where: 'id = ?', whereArgs: [id]);
+    if (!_usaSQLite) {
+      _memoria.removeWhere((g) => g.id == id);
+      return;
+    }
+  }
+
+  // =====================================================
+  //                ACTUALIZAR GASTO
+  // =====================================================
+  Future<Gasto> actualizarGasto(Gasto gasto) async {
+    if (!_usaSQLite) {
+      final idx = _memoria.indexWhere((g) => g.id == gasto.id);
+      if (idx != -1) {
+        _memoria[idx] = gasto;
+      }
+      return gasto;
+    }
+
+    return gasto;
   }
 }

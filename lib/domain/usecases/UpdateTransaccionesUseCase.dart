@@ -6,7 +6,7 @@ class UpdateTransaccionesUseCase {
 
   UpdateTransaccionesUseCase(this.repository);
 
-  /// Actualiza la transacción existente en el repositorio
+
   Future<void> call(Transaccion transaccion) async {
     await repository.actualizarTransaccion(transaccion);
   }

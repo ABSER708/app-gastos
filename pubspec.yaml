@@ -1,5 +1,5 @@
 name: seguidor_g
-description: "A new Flutter project."
+description: "app gastos."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -12,13 +12,22 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+
+  # JSON + modelos
   json_annotation: ^4.9.0
+
+  # Estado
   provider: ^6.0.5
+
+  # Fechas y formatos
   intl: ^0.18.1
+
+  # Generador de IDs únicos
+  uuid: ^4.0.0
 
   # Base de datos SQLite
   sqflite: ^2.3.3
-  path: ^1.8.3   # Compatible con tu SDK
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:
@@ -26,7 +35,7 @@ dev_dependencies:
 
   flutter_lints: ^5.0.0
 
-  # Para generar los archivos .g.dart de los modelos
+  # Generadores de código JSON
   build_runner: ^2.4.9
   json_serializable: ^6.8.0
 

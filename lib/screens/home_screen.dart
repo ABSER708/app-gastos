@@ -27,13 +27,16 @@ class HomeScreen extends StatelessWidget {
                 return Dismissible(
                   key: ValueKey(gasto.id),
                   background: Container(
-                    color: Colors.red,
+                    color: const Color.fromARGB(255, 152, 41, 33),
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: 20),
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
                   direction: DismissDirection.endToStart,
+
+                  // ⚠️ CORREGIDO: usar el método existente en el provider
                   onDismissed: (_) => gastosProvider.eliminar(gasto),
+
                   child: GastoItem(gasto: gasto),
                 );
               },
@@ -42,7 +45,9 @@ class HomeScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const NuevoGastoScreen()),
+            MaterialPageRoute(
+              builder: (_) => const NuevoGastoScreen(),
+            ),
           );
         },
         child: const Icon(Icons.add),

@@ -16,7 +16,20 @@ class Gasto {
     required this.fecha,
   });
 
-  // Métodos para json_serializable
   factory Gasto.fromJson(Map<String, dynamic> json) => _$GastoFromJson(json);
   Map<String, dynamic> toJson() => _$GastoToJson(this);
+
+  Gasto copyWith({
+    String? id,
+    String? titulo,
+    double? monto,
+    DateTime? fecha,
+  }) {
+    return Gasto(
+      id: id ?? this.id,
+      titulo: titulo ?? this.titulo,
+      monto: monto ?? this.monto,
+      fecha: fecha ?? this.fecha,
+    );
+  }
 }
